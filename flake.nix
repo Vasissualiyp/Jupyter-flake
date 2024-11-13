@@ -22,16 +22,22 @@
           matplotlib
           numpy
           scipy
+          jupyterlab  # Include JupyterLab in pythonEnv
+          ipykernel   # Include ipykernel to register kernels
         ]);
       in
       {
         devShell = pkgs.mkShell {
-          # Place pythonEnv first to ensure its bin directory is first in PATH
           buildInputs = with pkgs; [
-            pythonEnv
-            jupyter
+            pythonEnv    # Ensure pythonEnv is first
             qt5.qtwayland
+            # Remove jupyter from buildInputs
           ];
+
+          # Optional: Automatically register the kernel
+          shellHook = ''
+            python -m ipykernel install --user --name=python-env --display-name="Python (Env)"
+          '';
         };
       }
     );
