@@ -14,9 +14,24 @@
           config = {
             allowUnfree = true;
           };
+          overlays = [
+            (final: prev: {
+              python311Packages = prev.python311Packages.override {
+                # Use 'overrides' instead of 'packageOverrides'
+                overrides = self: super: {
+                  # Disable tests for websockets
+                  websockets = super.websockets.overrideAttrs (oldAttrs: {
+                    doCheck = false;
+                  });
+                };
+              };
+            })
+          ];
         };
 
-        python = pkgs.python3Full;
+        # Use python from python311Packages instead of python311Full
+        python = pkgs.python311Packages.python;
+
         pythonEnv = python.withPackages (ps: with ps; [
           pandas
           matplotlib
@@ -31,7 +46,7 @@
           buildInputs = with pkgs; [
             pythonEnv    # Ensure pythonEnv is first
             qt5.qtwayland
-            # Remove jupyter from buildInputs
+			firefox # Just in case brave breaks
           ];
 
           # Optional: Automatically register the kernel
