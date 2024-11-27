@@ -52,6 +52,7 @@
           # Optional: Automatically register the kernel
           shellHook = ''
             python -m ipykernel install --user --name=python-env --display-name="Python (Env)"
+			echo "Remember, that in order to make jupyter work in Firefox, after you start a Jupyter notebook from the terminal, you need to press Ctrl+C ONCE and copy the resulting URL"
           '';
         };
       }
