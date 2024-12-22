@@ -38,16 +38,54 @@ single_student_actions() {
 	echo "Printed $string into $csv"
 }
 
+overwrite_or_continue() {
+    csv_file="$1"
+	if [[ -f "$csv_file" ]]; then
+		read -p "File $csv_file was found. Overwrite (o) or continue (c)? " overwrite_vs_continue
+		if [ "$overwrite_vs_continue" = "o" ]; then
+		    echo "Overwriting the csv file"
+			students_marked=-1
+		elif [ "$overwrite_vs_continue" = "c" ]; then
+			num_csv_lines=$(wc -l "$csv_file" | awk '{print $1}')
+			if [ "$num_csv_lines" = "1" ]; then
+				echo "No students marked. Overwriting"
+		        students_marked=-1
+			else
+			    students_marked=$((num_csv_lines - 1))
+	            echo "Students marked: $students_marked"
+			fi
+		else
+			echo "Provided undeclared option: $overwrite_or_continue. Only allowed options are: o, c."
+			exit 1
+		fi
+	else
+		students_marked=-1
+		echo "No csv file found, so no need to overwrite"
+	fi
+}
+
+
 loop_through_students() {
 	directory=$(realpath "$1" )
 	csv_file=$( realpath "$2" )
-	setup_csv_file "$csv_file"
+
+	overwrite_or_continue "$csv_file"
+	if [[ "$students_marked" -eq -1 ]]; then
+	    setup_csv_file "$csv_file"
+	fi
+
 	(
     	cd "$directory" || { echo "Directory $directory not found" ; exit 1; }
     
+		i=0
     	pdfs_list=$(ls -1)
         for pdf in $pdfs_list; do
-			single_student_actions "$pdf" "$csv_file"
+			i=$((i + 1))
+			echo "i=$i"
+			if [[ i -gt $students_marked ]]; then
+			    echo "Working i=$i"
+			    single_student_actions "$pdf" "$csv_file"
+			fi
         done
     )
 }
