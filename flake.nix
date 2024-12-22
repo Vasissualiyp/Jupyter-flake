@@ -47,6 +47,7 @@
             pythonEnv    # Ensure pythonEnv is first
             qt5.qtwayland
 			firefox # Just in case brave breaks
+			libreoffice
           ];
 
           # Optional: Automatically register the kernel
